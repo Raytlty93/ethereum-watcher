@@ -10,10 +10,10 @@ import (
 
 const DefaultStepSizeForBigLag = 10
 
-//deprecated, please use receipt_log_watcher instead.
+// deprecated, please use receipt_log_watcher instead.
 func ListenForReceiptLogTillExit(
 	ctx context.Context,
-	api string,
+	api []string,
 	startBlock int,
 	contract string,
 	interestedTopics []string,
@@ -27,7 +27,12 @@ func ListenForReceiptLogTillExit(
 		stepSizeForBigLag = DefaultStepSizeForBigLag
 	}
 
-	rpc := rpc.NewEthRPCWithRetry(api, 5)
+	var rpcCli rpc.IBlockChainRPC
+	if len(api) > 1 {
+		rpcCli = rpc.NewEthMultiRPCWithRetry(api, 5)
+	} else {
+		rpcCli = rpc.NewEthRPCWithRetry(api[0], 5)
+	}
 
 	var blockNumToBeProcessedNext = startBlock
 
@@ -36,7 +41,7 @@ func ListenForReceiptLogTillExit(
 		case <-ctx.Done():
 			return blockNumToBeProcessedNext - 1
 		default:
-			highestBlock, err := rpc.GetCurrentBlockNum()
+			highestBlock, err := rpcCli.GetCurrentBlockNum()
 			if err != nil {
 				return blockNumToBeProcessedNext - 1
 			}
@@ -61,7 +66,7 @@ func ListenForReceiptLogTillExit(
 				to = blockNumToBeProcessedNext
 			}
 
-			logs, err := rpc.GetLogs(uint64(blockNumToBeProcessedNext), uint64(to), contract, interestedTopics)
+			logs, err := rpcCli.GetLogs(uint64(blockNumToBeProcessedNext), uint64(to), contract, interestedTopics)
 			if err != nil {
 				return blockNumToBeProcessedNext - 1
 			}

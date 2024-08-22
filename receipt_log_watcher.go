@@ -12,7 +12,7 @@ import (
 
 type ReceiptLogWatcher struct {
 	ctx                   context.Context
-	api                   string
+	api                   []string
 	startBlockNum         int
 	contract              string
 	interestedTopics      []string
@@ -24,7 +24,7 @@ type ReceiptLogWatcher struct {
 
 func NewReceiptLogWatcher(
 	ctx context.Context,
-	api string,
+	api []string,
 	startBlockNum int,
 	contract string,
 	interestedTopics []string,
@@ -94,14 +94,19 @@ func (w *ReceiptLogWatcher) Run() error {
 
 	var blockNumToBeProcessedNext = w.startBlockNum
 
-	rpc := rpc.NewEthRPCWithRetry(w.api, w.config.RPCMaxRetry)
+	var rpcCli rpc.IBlockChainRPC
+	if len(w.api) > 1 {
+		rpcCli = rpc.NewEthMultiRPCWithRetry(w.api, w.config.RPCMaxRetry)
+	} else {
+		rpcCli = rpc.NewEthRPCWithRetry(w.api[0], w.config.RPCMaxRetry)
+	}
 
 	for {
 		select {
 		case <-w.ctx.Done():
 			return nil
 		default:
-			highestBlock, err := rpc.GetCurrentBlockNum()
+			highestBlock, err := rpcCli.GetCurrentBlockNum()
 			if err != nil {
 				return err
 			}
@@ -136,7 +141,7 @@ func (w *ReceiptLogWatcher) Run() error {
 				to = highestBlockCanProcess
 			}
 
-			logs, err := rpc.GetLogs(uint64(blockNumToBeProcessedNext), uint64(to), w.contract, w.interestedTopics)
+			logs, err := rpcCli.GetLogs(uint64(blockNumToBeProcessedNext), uint64(to), w.contract, w.interestedTopics)
 			if err != nil {
 				return err
 			}
