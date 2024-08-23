@@ -20,11 +20,11 @@ func NewEthMultiRPCWithRetry(api []string, maxRetryCount int) *EthBlockChainMult
 }
 
 func (rpc EthBlockChainMultiRPCWithRetry) GetBlockByNum(num uint64) (rst blockchain.Block, err error) {
-	for _, r := range rpc.rpcList {
-		for i := 0; i <= rpc.maxRetryTimes; i++ {
+	for i := 0; i <= rpc.maxRetryTimes; i++ {
+		for _, r := range rpc.rpcList {
 			rst, err = r.GetBlockByNum(num)
 			if err == nil {
-				break
+				return
 			} else {
 				time.Sleep(time.Duration(500*(i+1)) * time.Millisecond)
 			}
@@ -35,11 +35,11 @@ func (rpc EthBlockChainMultiRPCWithRetry) GetBlockByNum(num uint64) (rst blockch
 }
 
 func (rpc EthBlockChainMultiRPCWithRetry) GetLiteBlockByNum(num uint64) (rst blockchain.Block, err error) {
-	for _, r := range rpc.rpcList {
-		for i := 0; i <= rpc.maxRetryTimes; i++ {
+	for i := 0; i <= rpc.maxRetryTimes; i++ {
+		for _, r := range rpc.rpcList {
 			rst, err = r.GetLiteBlockByNum(num)
 			if err == nil {
-				break
+				return
 			} else {
 				time.Sleep(time.Duration(500*(i+1)) * time.Millisecond)
 			}
@@ -50,11 +50,11 @@ func (rpc EthBlockChainMultiRPCWithRetry) GetLiteBlockByNum(num uint64) (rst blo
 }
 
 func (rpc EthBlockChainMultiRPCWithRetry) GetTransactionReceipt(txHash string) (rst blockchain.TransactionReceipt, err error) {
-	for _, r := range rpc.rpcList {
-		for i := 0; i <= rpc.maxRetryTimes; i++ {
+	for i := 0; i <= rpc.maxRetryTimes; i++ {
+		for _, r := range rpc.rpcList {
 			rst, err = r.GetTransactionReceipt(txHash)
 			if err == nil {
-				break
+				return
 			} else {
 				time.Sleep(time.Duration(500*(i+1)) * time.Millisecond)
 			}
@@ -66,11 +66,11 @@ func (rpc EthBlockChainMultiRPCWithRetry) GetTransactionReceipt(txHash string) (
 }
 
 func (rpc EthBlockChainMultiRPCWithRetry) GetCurrentBlockNum() (rst uint64, err error) {
-	for _, r := range rpc.rpcList {
-		for i := 0; i <= rpc.maxRetryTimes; i++ {
+	for i := 0; i <= rpc.maxRetryTimes; i++ {
+		for _, r := range rpc.rpcList {
 			rst, err = r.GetCurrentBlockNum()
 			if err == nil {
-				break
+				return
 			} else {
 				time.Sleep(time.Duration(500*(i+1)) * time.Millisecond)
 			}
@@ -84,11 +84,11 @@ func (rpc EthBlockChainMultiRPCWithRetry) GetLogs(
 	address string,
 	topics []string,
 ) (rst []blockchain.IReceiptLog, err error) {
-	for _, r := range rpc.rpcList {
-		for i := 0; i <= rpc.maxRetryTimes; i++ {
+	for i := 0; i <= rpc.maxRetryTimes; i++ {
+		for _, r := range rpc.rpcList {
 			rst, err = r.GetLogs(fromBlockNum, toBlockNum, address, topics)
 			if err == nil {
-				break
+				return
 			} else {
 				time.Sleep(time.Duration(500*(i+1)) * time.Millisecond)
 			}
