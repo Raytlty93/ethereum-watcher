@@ -149,7 +149,7 @@ var contractEventListenerCMD = &cobra.Command{
 
 		startBlockNum := -1
 		if blockBackoff > 0 {
-			rpc := rpc.NewEthRPCWithRetry(api, 3)
+			rpc := rpc.NewEthMultiRPCWithRetry([]string{api}, 3)
 			curBlockNum, err := rpc.GetCurrentBlockNum()
 			if err == nil {
 				startBlockNum = int(curBlockNum) - blockBackoff

@@ -39,12 +39,12 @@ type AbstractWatcher struct {
 	wg                      sync.WaitGroup
 }
 
-func NewHttpBasedEthWatcher(ctx context.Context, api string) *AbstractWatcher {
-	rpc := rpc.NewEthRPCWithRetry(api, 5)
+func NewHttpBasedEthWatcher(ctx context.Context, api []string) *AbstractWatcher {
+	rpcCli := rpc.NewEthMultiRPCWithRetry(api, 5)
 
 	return &AbstractWatcher{
 		Ctx:                     ctx,
-		rpc:                     rpc,
+		rpc:                     rpcCli,
 		NewBlockChan:            make(chan *structs.RemovableBlock, 32),
 		NewTxAndReceiptChan:     make(chan *structs.RemovableTxAndReceipt, 518),
 		NewReceiptLogChan:       make(chan *structs.RemovableReceiptLog, 518),
